@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>IDGAF</title>
+
+</head>
+<body style="background-color:linen">
+    <h1 style="background-color: lightpink">Type Test V1</h1>
+    <h3 style= "background-color: lightseagreen">
+        The text below with background color 
+        <span style = "background-color:lightgrey;">grey</span>
+        is what you are trying to copy into the text field below. 
+        The time starts as soon as you begin typing.
+    </h3>
+    
+    <h5 id="testText" style="background-color:lightgrey">
+    </h5>
+    
+    <textarea disabled placeholder="Click 'Start' Button to unlock." style="background-color: lightgray"></textarea>
+    
+    <div style="padding-top:15px">
+        <button id="startButton">Start</button>
+        <button id="resetButton">Reset</button>
+        <div style="padding-top:10px">
+            Time:
+            <div id="timer">00:00:00</div>
+        </div>
+        <div id="mistakes" style="color:lightcoral;font-weight:bold"></div>
+    </div>
+    
+    
+    
+</body>
+<script>
+
+    document.querySelector("body").setAttribute("style", "text-align:center");
+
+    var textArea = document.querySelector("textarea");
+    var startButton = document.querySelector("#startButton");
+    var resetButton = document.querySelector("#resetButton");
+    var testText = document.querySelector("#testText");
+    var text = "Copy this text into box below. Once finished, the timer will stop.";
+    var clock = document.querySelector("#timer");
+    var interval = null;
+    var mistakes = document.querySelector("#mistakes");
+    var mistakesCounter = 0;
+
+    var clockTime = 0;
+    
+    function startTest(){
+        testText.innerHTML = text;
+        startButton.disabled = true;
+        textArea.disabled = false;
+        textArea.placeholder = "";
+        textArea.cols = text.length-9;
+        textArea.removeAttribute("style");
+    }
+
+    function startClock(){
+        var textLength = textArea.value.length;
+        console.log(textLength);
+        if(textLength == 0){
+            clock.innerHTML = clockTime;
+            interval = setInterval(runTheClock, 10);
+        }
+    }
+
+    function formatHelper(time){
+        if(time <= 9){
+            return "0" + time;
+        }
+        return time;
+    }
+
+    function runTheClock(){
+        var min = Math.floor(clockTime / 6000);
+        var sec = Math.floor((clockTime / 100) % 60);
+        var msec = Math.floor(clockTime % 100);
+
+        clock.innerHTML = formatHelper(min) + ":" + formatHelper(sec) + ":" + formatHelper(msec);
+
+        clockTime++;
+    }
+
+    function reset(){
+        if(interval) clearInterval(interval);
+        clockTime = 0;
+        interval = null;
+        clock.innerHTML = "00:00:00";
+        mistakes.innerHTML = "";
+        clock.removeAttribute("style");
+        textArea.disabled = false;
+        textArea.value = "";
+        textArea.removeAttribute("style");
+        mistakesCounter = 0;
+        textArea.focus();
+
+    }
+
+    function checkText(){
+        var curTextArea = textArea.value;
+        var textChecker = text.substring(0, curTextArea.length);
+        console.log("curTexArea: " + curTextArea + "| textChecker: " + textChecker);
+
+        if(curTextArea == textChecker){
+            if(curTextArea.length > 0)
+                textArea.setAttribute("style", "background-color:lightgreen");
+        }
+        else{
+            mistakesCounter++;
+            textArea.setAttribute("style", "background-color:lightcoral");
+        }
+
+        if(text == textArea.value){
+            console.log("timer has stopped.");
+            clearInterval(interval);
+            textArea.disabled = true;
+            textArea.setAttribute("style", "background-color:green;");
+            var tempClock = "Final Time: " + clock.innerHTML;
+            clock.innerHTML = tempClock;
+            clock.setAttribute("style", "color:green;font-weight:bold;");
+            mistakes.innerHTML = "Total mistakes made: " + mistakesCounter;
+        }
+    }
+    
+    //event listeners:
+    startButton.addEventListener("click", startTest, false);
+    textArea.addEventListener("keypress", startClock, false);
+    textArea.addEventListener("keyup", checkText, false);
+    resetButton.addEventListener("click", reset, false);
+
+    
+    
+</script>
+</html>
